@@ -32,9 +32,7 @@ public class MainActivity extends AppCompatActivity {
         // Call a Python function
         try {
             JSONObject json = new JSONObject();
-            json.put("function", "greet");
-            json.put("name", "Python 3.5");
-
+            json.put("function", "version");
             JSONObject result = PyBridge.call(json);
             String answer = result.getString("result");
 

@@ -35,6 +35,7 @@ static PyMethodDef AndroidlogMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
 
 static struct PyModuleDef AndroidlogModule = {
     PyModuleDef_HEAD_INIT,
@@ -49,7 +50,12 @@ PyMODINIT_FUNC PyInit_androidlog(void)
 {
     return PyModule_Create(&AndroidlogModule);
 }
-
+#else
+PyMODINIT_FUNC PyInit_androidlog(void)
+{
+  (void)Py_InitModule("androidlog", AndroidlogMethods);
+}
+#endif
 
 void setAndroidLog()
 {
@@ -95,17 +101,25 @@ JNIEXPORT jint JNICALL Java_com_jventura_pybridge_PyBridge_start
 
     // Get the location of the python files
     const char *pypath = (*env)->GetStringUTFChars(env, path, NULL);
+    LOG(pypath);
 
     // Build paths for the Python interpreter
+
     char paths[512];
     snprintf(paths, sizeof(paths), "%s:%s/stdlib.zip", pypath, pypath);
-
+#if PY_MAJOR_VERSION >= 3
     // Set Python paths
     wchar_t *wchar_paths = Py_DecodeLocale(paths, NULL);
     Py_SetPath(wchar_paths);
+#else
+    Py_SetPath(paths);
+#endif
 
+#if PY_MAJOR_VERSION >= 3
     // Initialize Python interpreter and logging
     PyImport_AppendInittab("androidlog", PyInit_androidlog);
+#endif
+    Py_OptimizeFlag = 1;
     Py_Initialize();
     setAndroidLog();
 
@@ -114,8 +128,9 @@ JNIEXPORT jint JNICALL Java_com_jventura_pybridge_PyBridge_start
 
     // Cleanup
     (*env)->ReleaseStringUTFChars(env, path, pypath);
+#if PY_MAJOR_VERSION >= 3
     PyMem_RawFree(wchar_paths);
-
+#endif
     return 0;
 }
 
@@ -154,7 +169,12 @@ JNIEXPORT jstring JNICALL Java_com_jventura_pybridge_PyBridge_call
 
     // Call function and get the resulting string
     PyObject* myResult = PyObject_CallObject(myFunction, args);
+#if PY_MAJOR_VERSION >= 3
     char *myResultChar = PyUnicode_AsUTF8(myResult);
+#else
+    PyObject* myRepr = PyObject_Repr(myResult);
+    char *myResultChar = PyString_AsString(myResult);
+#endif
 
     // Store the result on a java.lang.String object
     jstring result = (*env)->NewStringUTF(env, myResultChar);
@@ -166,6 +186,10 @@ JNIEXPORT jstring JNICALL Java_com_jventura_pybridge_PyBridge_call
     Py_DECREF(myFunction);
     Py_DECREF(args);
     Py_DECREF(myResult);
+
+#if PY_MAJOR_VERSION < 3
+    Py_DECREF(myRepr);
+#endif
 
     return result;
 }

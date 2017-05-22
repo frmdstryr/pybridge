@@ -1,5 +1,5 @@
 LOCAL_PATH := $(call my-dir)
-CRYSTAX_PATH := /Users/jventura/Library/Android/crystax-ndk-10.3.2
+CRYSTAX_PATH := /home/jrm/Android/Crystax/crystax-ndk-10.3.2
 
 
 # Build libpybridge.so
@@ -8,14 +8,14 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := pybridge
 LOCAL_SRC_FILES := pybridge.c
 LOCAL_LDLIBS := -llog
-LOCAL_SHARED_LIBRARIES := python3.5m
+LOCAL_SHARED_LIBRARIES := python2.7
 include $(BUILD_SHARED_LIBRARY)
 
 
-# Include libpython3.5m.so
+# Include libpython2.7.so
 
 include $(CLEAR_VARS)
-LOCAL_MODULE    := python3.5m
-LOCAL_SRC_FILES := $(CRYSTAX_PATH)/sources/python/3.5/libs/$(TARGET_ARCH_ABI)/libpython3.5m.so
-LOCAL_EXPORT_CFLAGS := -I $(CRYSTAX_PATH)/sources/python/3.5/include/python/
+LOCAL_MODULE    := python2.7
+LOCAL_SRC_FILES := $(CRYSTAX_PATH)/sources/python/2.7/libs/$(TARGET_ARCH_ABI)/libpython2.7.so
+LOCAL_EXPORT_CFLAGS := -I $(CRYSTAX_PATH)/sources/python/2.7/include/python/
 include $(PREBUILT_SHARED_LIBRARY)

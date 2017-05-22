@@ -4,6 +4,7 @@
 
 """
 
+import sys
 import json
 
 
@@ -31,6 +32,9 @@ def router(args):
     })
 
 
+def version(args):
+    return 'Python version is %s' % sys.version
+
 def greet(args):
     """Simple function that greets someone."""
     return 'Hello %s' % args['name']
@@ -50,4 +54,5 @@ routes = {
     'greet': greet,
     'add': add,
     'mul': mul,
+    'version': version,
 }
